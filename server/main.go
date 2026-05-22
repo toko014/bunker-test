@@ -19,6 +19,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	
+	// Create tables if they don't exist
+	err = db.CreateTables(context.Background(), dbConn)
+	if err != nil {
+		log.Fatal("Failed to create tables:", err)
+	}
+	
 	database := db.New(dbConn)
 	err = db.Init(context.Background(), database)
 	if err != nil {
