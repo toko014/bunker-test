@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 const Index = () => {
     const [username, setUsername] = useState('')
     const [room, setRoom] = useState('')
-    const [buttonText, changeButtonText] = useState('СОЗДАТЬ')
+    const [buttonText, changeButtonText] = useState('შექმნა')
 
     const router = useRouter()
 
@@ -18,7 +18,7 @@ const Index = () => {
             res += a.indexOf(val[i]) == -1 ? '' : val[i].toUpperCase()
         }
         setRoom(res)
-        changeButtonText(res == '' ? 'СОЗДАТЬ' : 'ПРИСОЕДИНИТЬСЯ')
+        changeButtonText(res == '' ? 'შექმნა' : 'შეერთება')
     }
 
     const handleButtonClick = async (e: React.SyntheticEvent) => {
@@ -53,17 +53,17 @@ const Index = () => {
         <div className='flex items-center justify-center min-w-full min-h-screen'>
             <form className='flex flex-col w-3/4'>
                 <div className='text-5xl font-bold text-center'>
-                    <span className='text-blue'>УБЕЖИЩЕ</span>
+                    <span className='text-blue'>თავშესაფარი</span>
                 </div>
                 <input
-                    placeholder='ИМЯ'
+                    placeholder='სახელი'
                     className='p-3 mt-8 rounded-md border-2 border-grey font-bold text-3xl text-center focus:outline-none focus:border-blue'
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     maxLength={14}
                 />
                 <input
-                    placeholder='КОМНАТА'
+                    placeholder='ოთახი'
                     className='p-4 mt-8 rounded-md border-2 border-grey font-bold text-3xl text-center focus:outline-none focus:border-blue'
                     value={room}
                     onChange={handleRoomChange}
