@@ -229,14 +229,14 @@ const Room = () => {
                 <div className='flex items-center justify-center min-w-full min-h-screen'>
                     <form className='flex flex-col w-3/4'>
                         <input
-                            placeholder='ИМЯ'
+                            placeholder='სახელი'
                             className='p-3 mt-8 rounded-md border-2 border-grey font-bold text-3xl text-center focus:outline-none focus:border-blue'
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             maxLength={14}
                         />
                         <button className='p-3 mt-6 rounded-md bg-blue font-bold text-[25px] text-white' type='submit' onClick={handleConnectToRoomButton}>
-                            ПОДКЛЮЧИТЬСЯ К {router.query.room}
+                            დაკავშირება {router.query.room}-თან
                         </button>
                     </form>
                 </div>
@@ -247,14 +247,14 @@ const Room = () => {
                     <div className='flex items-center justify-center min-w-full min-h-screen'>
                         <form className='flex flex-col w-3/4'>
                             <div className='text-5xl font-bold text-center'>
-                                <span className='text-blue'>ОЖИДАНИЕ
-                                    ИГРОКОВ:{'\n'}
+                                <span className='text-blue'>მოთამაშეების
+                                    მოლოდინი:{'\n'}
                                     {playerCount}/15</span>
                             </div>
                             <LinkBox/>
                             <button className='p-6 mt-6 rounded-md bg-blue font-bold text-3xl text-white' type='submit'
                                     onClick={handleStartGameButton}>
-                                НАЧАТЬ ИГРУ!
+                                თამაშის დაწყება!
                             </button>
                         </form>
                     </div>
@@ -264,8 +264,8 @@ const Room = () => {
                     <div className='flex items-center justify-center min-w-full min-h-screen'>
                         <form className='flex flex-col w-3/4'>
                             <div className='text-5xl font-bold text-center'>
-                                <span className='text-blue'>ОЖИДАНИЕ
-                                    ИГРОКОВ:{'\n'}
+                                <span className='text-blue'>მოთამაშეების
+                                    მოლოდინი:{'\n'}
                                     {playerCount}/15
                                 </span>
                             </div>

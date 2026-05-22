@@ -29,30 +29,30 @@ func GenerateMainStringForCharacter() string {
 
 	res := ""
 	if male {
-		res += "мужчина"
+		res += "კაცი"
 	} else {
-		res += "женщина"
+		res += "ქალი"
 	}
 	res += " / " + strconv.Itoa(age)
 	if age%10 > 4 || age%10 == 0 || (age >= 10 && age <= 20) {
-		res += " лет"
+		res += " წლის"
 	} else if age%10 == 1 {
-		res += " год"
+		res += " წლის"
 	} else {
-		res += " года"
+		res += " წლის"
 	}
 	if !natural {
 		if male {
-			res += " / гей"
+			res += " / გეი"
 		} else {
-			res += " / лесбиянка"
+			res += " / ლესბოსელი"
 		}
 	}
 	if childfree {
-		res += " / чайлдфри"
+		res += " / ჩაილდფრი"
 	}
 	if pregnant {
-		res += " / беременная"
+		res += " / ორსული"
 	}
 
 	return res
