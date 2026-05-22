@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const backendUrl = `https://${API_URL}/play`;
+    const backendUrl = `${API_URL}/play`;
     const response = await fetch(backendUrl, {
       method: 'POST',
       headers: {

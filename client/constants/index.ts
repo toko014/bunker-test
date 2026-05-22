@@ -1,4 +1,4 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'bunker-test-production.up.railway.app/api'
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bunker-test-production.up.railway.app/api'
 export const WS_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'wss://bunker-test-production.up.railway.app/api'
 
 export const TextMessage = '0'
