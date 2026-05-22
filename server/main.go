@@ -31,7 +31,7 @@ func main() {
 	go hub.Run()
 
 	router.InitRouter(wsHandler)
-	err = router.Start("localhost:" + tools.GetPort())
+	err = router.Start("0.0.0.0:" + tools.GetPort())
 	if err != nil {
 		log.Fatalf("Router failed: %v", err)
 	}

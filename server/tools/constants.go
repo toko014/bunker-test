@@ -20,24 +20,22 @@ const (
 )
 
 func Init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// Try to load .env file (optional for local dev)
+	_ = godotenv.Load(".env")
 
 	port = os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT must be set in .env file")
+		log.Fatal("PORT must be set")
 	}
 
 	db_url = os.Getenv("DB_URL")
 	if db_url == "" {
-		log.Fatal("DB_URL must be set in .env file")
+		log.Fatal("DB_URL must be set")
 	}
 
 	key = os.Getenv("KEY")
 	if key == "" {
-		log.Fatal("KEY must be set in .env file")
+		log.Fatal("KEY must be set")
 	}
 }
 
