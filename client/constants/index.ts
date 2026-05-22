@@ -1,5 +1,5 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'hideoutgame.ru/api'
-export const WS_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'wss://hideoutgame.ru/api'
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'bunker-test-production.up.railway.app/api'
+export const WS_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'wss://bunker-test-production.up.railway.app/api'
 
 export const TextMessage = '0'
 export const PlayerJoined = '1'
