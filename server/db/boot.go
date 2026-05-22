@@ -18,12 +18,12 @@ func Init(c context.Context, db *Queries) error {
 		return err
 	}
 
-	err = initGame(ctx, db, "../server/db/init/game/")
+	err = initGame(ctx, db, "db/init/game/")
 	if err != nil {
 		return errors.New("Error initializing game's tables: " + err.Error())
 	}
 
-	err = initCharacter(ctx, db, "../server/db/init/character/")
+	err = initCharacter(ctx, db, "db/init/character/")
 	if err != nil {
 		return errors.New("Error initializing character's tables: " + err.Error())
 	}
