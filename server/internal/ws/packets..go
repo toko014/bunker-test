@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"github.com/BulizhnikGames/hideout/db"
 	"github.com/BulizhnikGames/hideout/internal/packets"
+	"github.com/google/uuid"
 	"log"
 	"strconv"
 	"strings"
@@ -21,6 +22,8 @@ func Init() {
 	handlersTable[packets.UpdateGame] = handleUpdateGame
 	handlersTable[packets.NewParam] = handleNewParam
 	handlersTable[packets.DeleteParam] = handleDeleteParam
+	handlersTable[packets.StartVote] = handleStartVote
+	handlersTable[packets.CastVote] = handleCastVote
 }
 
 func handleTextMessage(hub *Hub, packet *Message) {
@@ -186,3 +189,117 @@ func sendGameData(hub *Hub, game *db.Game, roomID string) {
 		Data:     data,
 	}
 }
+
+func handleStartVote(hub *Hub, packet *Message) {
+	room := hub.Rooms[packet.RoomID]
+	
+	// Check if game has started
+	if room.GameID == uuid.Nil {
+		log.Println("Cannot start vote before game starts")
+		return
+	}
+	
+	// Check if vote already in progress
+	if room.VoteInProgress {
+		log.Println("Vote already in progress")
+		return
+	}
+	
+	// Check if player is eliminated
+	if room.Eliminated[packet.Username] {
+		log.Println("Eliminated player cannot start vote")
+		return
+	}
+	
+	// Start vote
+	room.VoteInProgress = true
+	room.Votes = make(map[string]string)
+	
+	log.Printf("Vote started in room %s by %s", packet.RoomID, packet.Username)
+	
+	// Broadcast vote start
+	hub.Broadcast <- &Message{
+		Type:     packets.VoteData,
+		Username: "",
+		RoomID:   packet.RoomID,
+		Data:     "start",
+	}
+}
+
+func handleCastVote(hub *Hub, packet *Message) {
+	room := hub.Rooms[packet.RoomID]
+	
+	// Check if vote in progress
+	if !room.VoteInProgress {
+		log.Println("No vote in progress")
+		return
+	}
+	
+	// Check if player is eliminated
+	if room.Eliminated[packet.Username] {
+		log.Println("Eliminated player cannot vote")
+		return
+	}
+	
+	// Check if target is valid
+	target := packet.Data
+	if _, ok := room.Players[target]; !ok {
+		log.Printf("Invalid vote target: %s", target)
+		return
+	}
+	
+	// Check if target is already eliminated
+	if room.Eliminated[target] {
+		log.Printf("Cannot vote for eliminated player: %s", target)
+		return
+	}
+	
+	// Record vote
+	room.Votes[packet.Username] = target
+	log.Printf("%s voted for %s in room %s", packet.Username, target, packet.RoomID)
+	
+	// Check if everyone has voted (excluding eliminated players)
+	activePlayerCount := 0
+	for username := range room.Players {
+		if !room.Eliminated[username] {
+			activePlayerCount++
+		}
+	}
+	
+	if len(room.Votes) >= activePlayerCount {
+		// Tally votes
+		voteCounts := make(map[string]int)
+		for _, target := range room.Votes {
+			voteCounts[target]++
+		}
+		
+		// Find player with most votes
+		maxVotes := 0
+		var eliminated string
+		for player, count := range voteCounts {
+			if count > maxVotes {
+				maxVotes = count
+				eliminated = player
+			}
+		}
+		
+		// Eliminate player
+		if eliminated != "" {
+			room.Eliminated[eliminated] = true
+			log.Printf("Player %s eliminated in room %s with %d votes", eliminated, packet.RoomID, maxVotes)
+		}
+		
+		// End vote
+		room.VoteInProgress = false
+		room.Votes = make(map[string]string)
+		
+		// Broadcast result
+		hub.Broadcast <- &Message{
+			Type:     packets.VoteResult,
+			Username: "",
+			RoomID:   packet.RoomID,
+			Data:     eliminated,
+		}
+	}
+}
+

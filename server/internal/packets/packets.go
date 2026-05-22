@@ -12,3 +12,7 @@ const UpdateGame string = "8"   // from client
 const NewParam string = "9"     // from client
 const DeleteParam string = "10" // from client
 const UpdatedChar string = "11" // from server
+const StartVote string = "12"   // from client
+const VoteData string = "13"    // from server
+const CastVote string = "14"    // from client
+const VoteResult string = "15"  // from server

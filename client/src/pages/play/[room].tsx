@@ -9,7 +9,7 @@ import {
     PlayerLeft,
     GameData,
     CharData,
-    UpdateLock, UpdateGame, UpdatedChar
+    UpdateLock, UpdateGame, UpdatedChar, StartVote, VoteData, CastVote, VoteResult
 } from "../../../constants";
 import useWebSocket from "react-use-websocket";
 import LinkBox from './link'
@@ -65,6 +65,10 @@ const Room = () => {
     const [chars, setChars] = useState<Array<Character>>([])
     const [playerCount, changePlayerCount] = useState(0)
     const [selectedChar, selectOther] = useState(0)
+    const [voteInProgress, setVoteInProgress] = useState(false)
+    const [showVoteModal, setShowVoteModal] = useState(false)
+    const [eliminated, setEliminated] = useState<Set<string>>(new Set())
+    const [voteResult, setVoteResult] = useState('')
 
     const router = useRouter()
 
@@ -182,6 +186,20 @@ const Room = () => {
                     }
                 }
                 setChars(newChars)
+            } else if (m.type == VoteData) {
+                if (m.data === 'start') {
+                    setVoteInProgress(true)
+                    setShowVoteModal(true)
+                    setVoteResult('')
+                }
+            } else if (m.type == VoteResult) {
+                setVoteInProgress(false)
+                setShowVoteModal(false)
+                if (m.data !== '') {
+                    setEliminated(prev => new Set(prev).add(m.data))
+                    setVoteResult(m.data)
+                    setTimeout(() => setVoteResult(''), 5000)
+                }
             }
         }
     }, [lastJsonMessage]);
@@ -221,6 +239,16 @@ const Room = () => {
 
     const handleUpdateGame = (code: string) : void => {
         sendJsonMessage(UpdateGame + ":" + code)
+    }
+
+    const handleStartVote = () => {
+        if (game.id === '' || eliminated.has(username)) return
+        sendJsonMessage(StartVote + ":")
+    }
+
+    const handleCastVote = (target: string) => {
+        sendJsonMessage(CastVote + ":" + target)
+        setShowVoteModal(false)
     }
 
     if (game.id === ''){
@@ -291,8 +319,48 @@ const Room = () => {
                             <button className='py-2 px-8 text-[18px] text-center text-white bg-blue rounded-md w-5/12'
                                     onClick={nextChar}>{getChar(selectedChar + 1)}</button>
                         </div>
+                        {!eliminated.has(username) && !voteInProgress && (
+                            <button className='mt-4 py-3 px-6 text-center text-white bg-red rounded-md font-bold text-2xl'
+                                    onClick={handleStartVote}>
+                                ხმის მიცემის დაწყება
+                            </button>
+                        )}
+                        {voteResult && (
+                            <div className='mt-4 p-4 bg-red text-white rounded-md text-center font-bold text-2xl'>
+                                {voteResult} აიძულა გავიდეს!
+                            </div>
+                        )}
+                        {eliminated.has(username) && (
+                            <div className='mt-4 p-4 bg-gray-600 text-white rounded-md text-center font-bold text-2xl'>
+                                თქვენ ამოგარიცხეს თამაშიდან
+                            </div>
+                        )}
                         <Admin game={handleUpdateGame}/>
                     </div>
+                    {showVoteModal && (
+                        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                            <div className='bg-white p-6 rounded-lg max-w-md w-full'>
+                                <h2 className='text-2xl font-bold mb-4 text-center'>აირჩიეთ ვინ გადის</h2>
+                                <div className='space-y-2'>
+                                    {chars.filter(c => !eliminated.has(c.username) && c.username !== username).map((char) => (
+                                        <button
+                                            key={char.username}
+                                            onClick={() => handleCastVote(char.username)}
+                                            className='w-full py-3 px-4 bg-blue text-white rounded-md font-bold text-xl hover:bg-blue-600'
+                                        >
+                                            {char.username}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setShowVoteModal(false)}
+                                    className='mt-4 w-full py-2 px-4 bg-gray-500 text-white rounded-md'
+                                >
+                                    გაუქმება
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )
         } else {
@@ -310,7 +378,47 @@ const Room = () => {
                             <button className='py-2 px-8 text-[18px] text-center text-white bg-blue rounded-md w-5/12'
                                     onClick={nextChar}>{getChar(selectedChar + 1)}</button>
                         </div>
+                        {!eliminated.has(username) && !voteInProgress && (
+                            <button className='mt-4 py-3 px-6 text-center text-white bg-red rounded-md font-bold text-2xl'
+                                    onClick={handleStartVote}>
+                                ხმის მიცემის დაწყება
+                            </button>
+                        )}
+                        {voteResult && (
+                            <div className='mt-4 p-4 bg-red text-white rounded-md text-center font-bold text-2xl'>
+                                {voteResult} აიძულა გავიდეს!
+                            </div>
+                        )}
+                        {eliminated.has(username) && (
+                            <div className='mt-4 p-4 bg-gray-600 text-white rounded-md text-center font-bold text-2xl'>
+                                თქვენ ამოგარიცხეს თამაშიდან
+                            </div>
+                        )}
                     </div>
+                    {showVoteModal && (
+                        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                            <div className='bg-white p-6 rounded-lg max-w-md w-full'>
+                                <h2 className='text-2xl font-bold mb-4 text-center'>აირჩიეთ ვინ გადის</h2>
+                                <div className='space-y-2'>
+                                    {chars.filter(c => !eliminated.has(c.username) && c.username !== username).map((char) => (
+                                        <button
+                                            key={char.username}
+                                            onClick={() => handleCastVote(char.username)}
+                                            className='w-full py-3 px-4 bg-blue text-white rounded-md font-bold text-xl hover:bg-blue-600'
+                                        >
+                                            {char.username}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setShowVoteModal(false)}
+                                    className='mt-4 w-full py-2 px-4 bg-gray-500 text-white rounded-md'
+                                >
+                                    გაუქმება
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )
         }

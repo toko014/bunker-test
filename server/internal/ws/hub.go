@@ -13,9 +13,12 @@ import (
 )
 
 type Room struct {
-	ID      string             `json:"id"`
-	GameID  uuid.UUID          `json:"gameID"`
-	Players map[string]*Player `json:"players"`
+	ID             string             `json:"id"`
+	GameID         uuid.UUID          `json:"gameID"`
+	Players        map[string]*Player `json:"players"`
+	VoteInProgress bool               `json:"voteInProgress"`
+	Votes          map[string]string  `json:"votes"`
+	Eliminated     map[string]bool    `json:"eliminated"`
 }
 
 type Hub struct {
@@ -114,8 +117,11 @@ func (h *Hub) CreateNewRoom(c context.Context) (*Room, error) {
 	}
 
 	h.Rooms[id] = &Room{
-		ID:      id,
-		Players: make(map[string]*Player),
+		ID:             id,
+		Players:        make(map[string]*Player),
+		VoteInProgress: false,
+		Votes:          make(map[string]string),
+		Eliminated:     make(map[string]bool),
 	}
 
 	return h.Rooms[id], nil
